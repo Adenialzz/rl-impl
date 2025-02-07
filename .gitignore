@@ -1,0 +1,8 @@
+
+__pycache__/
+
+# pytorch models
+*.pt
+*.pth
+*.safetensors
+*.bin
