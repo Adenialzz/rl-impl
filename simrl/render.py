@@ -1,11 +1,13 @@
 import gym
 import torch
 from .algos.q_learning.dqn import DQN
+from .algos.policy_gradient.simple_pg import SimplePolicyGradient
 from .utils import load_mlp
 
 def render(method: str = 'dqn', env_name: str = 'CartPole-v0', model_path: str = 'model.pt'):
     _methods_map = dict(
-        dqn=DQN
+        dqn=DQN,
+        simple_policy_gradient=SimplePolicyGradient
     )
     
     env = gym.make(env_name, render_mode="human")

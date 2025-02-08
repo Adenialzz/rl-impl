@@ -2,18 +2,6 @@ import torch
 from typing import Optional
 from .models import MLP
 
-def get_policy(model_out_logits) -> torch.distributions.Distribution:
-    policy = torch.distributions.Categorical(logits=model_out_logits)
-    return policy
-
-def get_action(model_out_logits) -> int:
-    policy = get_policy(model_out_logits)
-    action = policy.sample().item()
-    return action
-
-def get_action_from_q(q_values: torch.Tensor) -> int:
-    action = q_values.max(0)[1].item() # choose action index corresponding to the maximum q value
-    return action
 
 def save_mlp(model: MLP, save_path: str):
     mlp_config = dict(

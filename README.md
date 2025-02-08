@@ -16,4 +16,4 @@ pip install -e .
 
 # Standalone Scripts
 
-Some basic rl algorithms is implemented in a standalone manner (without depending on `simrl` package) in [./standalone_scripts](./standalone_scripts) directory.
+Some basic rl algorithms is implemented in a standalone manner (without depending on `simrl` package) in [./standalone](./standalone) directory.

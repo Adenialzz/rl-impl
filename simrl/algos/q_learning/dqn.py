@@ -141,4 +141,6 @@ class DQN:
 
     def save_q_net(self, save_path: str):
         save_mlp(self.q_net, save_path)
-            
+
+    def save_model(self, save_path: str):
+        self.save_q_net(save_path)
