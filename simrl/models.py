@@ -1,13 +1,31 @@
+import torch
 import torch.nn as nn
+from typing import List
 
 class MLP(nn.Module):
-    def __init__(self, in_dim:int , hidden_dim:int , out_dim: int):
-        super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(in_dim, hidden_dim),
-            nn.Tanh(),
-            nn.Linear(hidden_dim, out_dim),
-        )
+    _act_func_map = dict(
+        relu=nn.ReLU,
+        tanh=nn.Tanh
+    )
 
-    def forward(self, x):
+    def __init__(
+        self,
+        hidden_dims: List[int],
+        act: str = 'relu'
+    ):
+        super().__init__()
+
+        self.hidden_dims = hidden_dims
+        self.act = act
+
+        act_func = self._act_func_map.get(act.lower(), None)
+        if act_func is None:
+            raise KeyError(f'unknown activation function: {act}, please choose from {list(self._act_func_map.keys())}')
+
+        layers= []
+        for j in range(len(hidden_dims)-1):
+            layers += [nn.Linear(hidden_dims[j], hidden_dims[j+1]), act_func()]
+        self.net = nn.Sequential(*layers)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.net(x)

@@ -1,5 +1,8 @@
 # Reinforcement Learning Implementations
 
+# TODO
+
+1. 将 standalone_scripts 中的依赖尽快解决掉
 
 # Installation
 
