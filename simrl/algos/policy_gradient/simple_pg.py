@@ -1,11 +1,18 @@
 import torch
 import torch.nn as nn
 import gym
+import numpy as np
 from typing import Tuple, List
-from simrl.schema import BatchData
+from dataclasses import dataclass, field
 from ...utils import AverageMeter, save_mlp
 from ...models import MLP
 
+
+@dataclass
+class BatchData:
+    actions: List[int] = field(default_factory=list)
+    obs: List[List[float]] = field(default_factory=list)
+    episode_return: List[float] = field(default_factory=list)
 
 class SimplePolicyGradient:
     def __init__(
@@ -35,6 +42,8 @@ class SimplePolicyGradient:
     @staticmethod
     @torch.no_grad()
     def get_action(policy_model: nn.Module, state: torch.Tensor) -> int:
+        if not isinstance(state, torch.Tensor):
+            state = torch.tensor(state)
         logits = policy_model(state)
         policy = torch.distributions.Categorical(logits=logits)
         action = policy.sample().item()
@@ -89,9 +98,9 @@ class SimplePolicyGradient:
 
         self.optimizer.zero_grad()
         
-        obs = torch.as_tensor(data.obs, dtype=torch.float32)
-        actions = torch.as_tensor(data.actions, dtype=torch.int32)
-        returns = torch.as_tensor(data.episode_return, dtype=torch.float32)
+        obs = torch.as_tensor(np.array(data.obs), dtype=torch.float32)
+        actions = torch.as_tensor(np.array(data.actions), dtype=torch.int32)
+        returns = torch.as_tensor(np.array(data.episode_return), dtype=torch.float32)
 
         logits = self.policy_model(obs)        # 这里为啥要重新 forward 一遍算 logits ？
         policy = torch.distributions.Categorical(logits=logits)

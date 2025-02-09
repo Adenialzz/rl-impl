@@ -1,19 +1,30 @@
 from simrl.algos.policy_gradient.simple_pg import SimplePolicyGradient
-from simrl.render import render
+from simrl.evaluation import render, evaluation
+from simrl.utils import load_mlp
+from functools import partial
 import os
 
 def test_simple_policy_gradient():
     env_name='CartPole-v0'
     save_path = 'pg.pt'
-    dqn = SimplePolicyGradient(env_name=env_name)
-
+    num_eval_episode = 20
 
     # training
-    dqn.run(total_steps=50, batch_size=5000)
-    dqn.save_model(save_path)
+    simple_pg = SimplePolicyGradient(env_name=env_name)
+    simple_pg.run(total_steps=50, batch_size=5000)
+    simple_pg.save_model(save_path)
+
+    model = load_mlp(save_path)
+
+    # format polict
+    policy = partial(SimplePolicyGradient.get_action, policy_model=model)
 
     # render and visualize
-    render('simple_policy_gradient', env_name, save_path)
+    render(env_name, policy)
+    
+    # evalution
+    avg_ret = evaluation(env_name, policy, num_eval_episode)
+    print(f"evalution {num_eval_episode} episodes, avg return: {avg_ret}")
 
     os.remove(save_path)
 

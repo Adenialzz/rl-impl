@@ -1,5 +1,6 @@
 from simrl.algos.q_learning.dqn import DQN
-from simrl.render import render
+from simrl.evaluation import render, evaluation
+from functools import partial
 import os
 
 def test_dqn():
@@ -9,11 +10,16 @@ def test_dqn():
     save_path = 'dqn.pt'
 
     # training
-    dqn.run(total_steps=100000, batch_size=64)
+    dqn.run(total_steps=20000, batch_size=64)
     dqn.save_model(save_path)
 
+    policy = partial(DQN.get_action, q_net=dqn.q_net)
+
     # render and visualize
-    render('dqn', env_name, save_path)
+    render(env_name, policy=policy)
+
+    avg_ret = evaluation(env_name, policy, 10)
+    print("avg return: ", avg_ret)
 
     os.remove(save_path)
 

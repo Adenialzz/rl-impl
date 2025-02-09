@@ -1,12 +1,13 @@
 import torch
-from typing import Optional
+import gym
+from typing import Optional, Callable, Tuple
 from .models import MLP
-
 
 def save_mlp(model: MLP, save_path: str):
     mlp_config = dict(
         hidden_dims=model.hidden_dims,
-        act=model.act
+        act=model.act,
+        out_act=model.out_act
     )
 
     ckpt = dict(
@@ -22,7 +23,7 @@ def load_mlp(model_path: str) -> MLP:
     model.load_state_dict(ckpt['state_dict'])
     return model
 
-class AverageMeter(object):
+class AverageMeter:
     '''
     Computes and stores the average and current value
     '''

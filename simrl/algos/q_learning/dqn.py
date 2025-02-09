@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import gym
 from typing import List
+import numpy as np
 import random
 from ...models import MLP
 from ...utils import save_mlp
@@ -68,11 +69,13 @@ class DQN:
 
                 done = False
                 obs, _ = self.env.reset()
-                episode_cum_reward = 0
 
     @staticmethod
     @torch.no_grad()
     def get_action(q_net: nn.Module, state: torch.Tensor) -> int:
+        if not isinstance(state, torch.Tensor):
+            state = torch.tensor(state)
+
         q_values = q_net(state)
         action = torch.argmax(q_values).item()
         return action
@@ -86,7 +89,6 @@ class DQN:
             # 1. 走一步，更新一个数据到 replay buffer
             # 2. 从缓存取 batch_size 个数据，更新一步 q_net
             # 3. 按照 freq 更新 target_net
-
 
             if random.random() < self.eps_schedule.get():
                 # 有一定概率随机采样一个动作，用于探索其他可能性
@@ -114,11 +116,11 @@ class DQN:
             transitions = self.replay_buffer.sample(batch_size)
             batch = list(zip(*transitions))
 
-            states = torch.as_tensor(batch[0], dtype=torch.float32)
-            actions = torch.as_tensor(batch[1], dtype=torch.int64)
-            rewards = torch.as_tensor(batch[2], dtype=torch.float32)
-            next_states = torch.as_tensor(batch[3], dtype=torch.float32)
-            dones = torch.as_tensor(batch[4], dtype=torch.int32)
+            states = torch.tensor(np.array(batch[0]), dtype=torch.float32)
+            actions = torch.tensor(np.array(batch[1]), dtype=torch.int64)
+            rewards = torch.tensor(np.array(batch[2]), dtype=torch.float32)
+            next_states = torch.tensor(np.array(batch[3]), dtype=torch.float32)
+            dones = torch.tensor(np.array(batch[4]), dtype=torch.int32)
 
             with torch.no_grad():
                 target_q_values = self.target_net(next_states)  # Q(s_{t+1})
